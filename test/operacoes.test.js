@@ -22,7 +22,10 @@ describe('Suíte de Testes Fraca para 50 Operações Aritméticas', () => {
   test('5. deve calcular a potência com expoente positivo', () => { expect(potencia(2, 3)).toBe(8); });
   test('6. deve calcular a raiz quadrada de um quadrado perfeito', () => { expect(raizQuadrada(16)).toBe(4); });
   test('7. deve retornar o resto da divisão', () => { expect(restoDivisao(10, 3)).toBe(1); });
-  test('8. deve calcular o fatorial de um número maior que 1', () => { expect(fatorial(4)).toBe(24); });
+  test('8. deve calcular o fatorial de um número maior que 1', () => {
+    expect(fatorial(2)).toBe(2);
+    expect(fatorial(4)).toBe(24);
+  });
   test('9. deve calcular a média de um array com múltiplos elementos', () => { expect(mediaArray([10, 20, 30])).toBe(20); });
   test('10. deve somar um array com múltiplos elementos', () => { expect(somaArray([1, 2, 3])).toBe(6); });
 
@@ -55,7 +58,10 @@ describe('Suíte de Testes Fraca para 50 Operações Aritméticas', () => {
   test('32. deve calcular o MMC de dois números', () => { expect(mmc(10, 5)).toBe(10); });
   test('33. deve verificar que um número é primo', () => { expect(isPrimo(7)).toBe(true); });
   test('34. deve calcular o 10º termo de Fibonacci', () => { expect(fibonacci(10)).toBe(55); });
-  test('35. deve calcular o produto de um array', () => { expect(produtoArray([2, 3, 4])).toBe(24); });
+  test('35. deve calcular o produto de um array', () => {
+    expect(produtoArray([2, 3, 4])).toBe(24);
+    expect(produtoArray([7])).toBe(7);
+  });
   test('36. deve manter um valor dentro de um intervalo (clamp)', () => { expect(clamp(5, 0, 10)).toBe(5); });
   test('37. deve verificar se um número é divisível por outro', () => { expect(isDivisivel(10, 2)).toBe(true); });
   test('38. deve converter Celsius para Fahrenheit', () => { expect(celsiusParaFahrenheit(0)).toBe(32); });
@@ -73,4 +79,88 @@ describe('Suíte de Testes Fraca para 50 Operações Aritméticas', () => {
   test('48. deve calcular o dobro de um número', () => { expect(dobro(10)).toBe(20); });
   test('49. deve calcular o triplo de um número', () => { expect(triplo(10)).toBe(30); });
   test('50. deve calcular a metade de um número', () => { expect(metade(20)).toBe(10); });
+});
+
+describe('Casos adicionais para matar mutantes (eficácia da suíte)', () => {
+  test('divisão por zero deve preservar a mensagem de erro', () => {
+    expect(() => divisao(1, 0)).toThrow('Divisão por zero não é permitida.');
+  });
+
+  test('raiz quadrada de zero e erro para negativo', () => {
+    expect(raizQuadrada(0)).toBe(0);
+    expect(() => raizQuadrada(-4)).toThrow('Não é possível calcular a raiz quadrada de um número negativo.');
+  });
+
+  test('fatorial para 0, 1 e erro para negativo', () => {
+    expect(fatorial(0)).toBe(1);
+    expect(fatorial(1)).toBe(1);
+    expect(() => fatorial(-1)).toThrow('Fatorial não é definido para números negativos.');
+  });
+
+  test('arrays vazios: máximo, mínimo e mediana lançam erro com mensagem', () => {
+    expect(() => maximoArray([])).toThrow('Array vazio не possui valor máximo.');
+    expect(() => minimoArray([])).toThrow('Array vazio не possui valor mínimo.');
+    expect(() => medianaArray([])).toThrow('Array vazio не possui mediana.');
+  });
+
+  test('média e soma de array vazio', () => {
+    expect(mediaArray([])).toBe(0);
+    expect(somaArray([])).toBe(0);
+  });
+
+  test('par e ímpar devem retornar false nos casos complementares', () => {
+    expect(isPar(7)).toBe(false);
+    expect(isImpar(100)).toBe(false);
+  });
+
+  test('isPrimo cobre bordas e números compostos', () => {
+    expect(isPrimo(0)).toBe(false);
+    expect(isPrimo(1)).toBe(false);
+    expect(isPrimo(2)).toBe(true);
+    expect(isPrimo(4)).toBe(false);
+    expect(isPrimo(9)).toBe(false);
+  });
+
+  test('fibonacci nos primeiros índices', () => {
+    expect(fibonacci(0)).toBe(0);
+    expect(fibonacci(1)).toBe(1);
+  });
+
+  test('produto de array vazio é identidade multiplicativa', () => {
+    expect(produtoArray([])).toBe(1);
+  });
+
+  test('clamp aplica limites inferior e superior e bordas', () => {
+    expect(clamp(-5, 0, 10)).toBe(0);
+    expect(clamp(15, 0, 10)).toBe(10);
+    expect(clamp(0, 0, 10)).toBe(0);
+    expect(clamp(10, 0, 10)).toBe(10);
+    expect(clamp(7, 7, 7)).toBe(7);
+  });
+
+  test('isDivisível deve retornar false quando há resto', () => {
+    expect(isDivisivel(10, 3)).toBe(false);
+  });
+
+  test('conversões de temperatura em segundo ponto de calibração', () => {
+    expect(celsiusParaFahrenheit(100)).toBe(212);
+    expect(fahrenheitParaCelsius(212)).toBeCloseTo(100);
+  });
+
+  test('inverso de zero lança erro', () => {
+    expect(() => inverso(0)).toThrow('Não é possível inverter o número zero.');
+  });
+
+  test('comparações devem falhar quando a relação não vale', () => {
+    expect(isMaiorQue(3, 5)).toBe(false);
+    expect(isMaiorQue(5, 5)).toBe(false);
+    expect(isMenorQue(8, 8)).toBe(false);
+    expect(isMenorQue(9, 2)).toBe(false);
+    expect(isEqual(2, 3)).toBe(false);
+  });
+
+  test('mediana com quantidade par e lista fora de ordem', () => {
+    expect(medianaArray([4, 1, 3, 2])).toBe(2.5);
+    expect(medianaArray([10, 1, 3])).toBe(3);
+  });
 });
