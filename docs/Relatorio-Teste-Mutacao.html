@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Relatório — Teste de Mutação (StrykerJS)</title>
+  <style>
+    @page { size: A4; margin: 14mm 16mm; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", Calibri, Arial, sans-serif;
+      font-size: 10pt;
+      line-height: 1.35;
+      color: #1a1a1a;
+      max-width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    h2 { font-size: 11.5pt; border-bottom: 1px solid #333; padding-bottom: 2px; margin: 0.7em 0 0.35em; }
+    h3 { font-size: 10.3pt; margin: 0.55em 0 0.2em; }
+    .capa { text-align: center; padding-top: 18mm; padding-bottom: 12mm; }
+    .capa .inst { font-size: 10pt; margin-bottom: 4mm; color: #333; }
+    .capa .disciplina { font-size: 13pt; font-weight: 600; margin-bottom: 6mm; }
+    .capa .titulo-trabalho { font-size: 13.5pt; margin: 8mm 0; line-height: 1.3; }
+    .capa .aluno { margin-top: 14mm; font-size: 11pt; }
+    .capa .matricula { margin-top: 3mm; font-size: 10pt; }
+    .capa .repo { margin-top: 12mm; font-size: 9pt; color: #333; word-break: break-all; text-align: center; max-width: 95%; margin-left: auto; margin-right: auto; }
+    p { margin: 0.35em 0; text-align: justify; }
+    code, .mono { font-family: Consolas, "Courier New", monospace; font-size: 8.8pt; }
+    .figura {
+      border: 1px solid #aaa;
+      margin: 6px 0;
+      padding: 5px 6px;
+      font-size: 8.5pt;
+      background: #fafafa;
+      page-break-inside: avoid;
+    }
+    .figura strong { display: block; margin-bottom: 3px; }
+    .figura img {
+      display: block;
+      max-height: 44mm;
+      width: auto;
+      max-width: 100%;
+      margin: 3px auto;
+      border: 1px solid #999;
+    }
+    .figura .legenda { margin-top: 3px; color: #333; line-height: 1.25; font-size: 8pt; }
+    .row-figuras {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin: 6px 0;
+    }
+    .row-figuras .figura {
+      flex: 1 1 calc(50% - 4px);
+      min-width: 140px;
+      margin: 0;
+    }
+    .row-figuras .figura img { max-height: 40mm; }
+    .destaque {
+      background: #eee;
+      padding: 5px 7px;
+      margin: 6px 0;
+      border-left: 2px solid #444;
+      font-size: 9.5pt;
+      line-height: 1.3;
+    }
+    .quebra-pagina { page-break-before: always; }
+    table { border-collapse: collapse; width: 100%; font-size: 9.2pt; margin: 6px 0; }
+    th, td { border: 1px solid #999; padding: 4px 6px; text-align: left; vertical-align: top; }
+    th { background: #e5e5e5; }
+    ul.compact { margin: 0.25em 0; padding-left: 1.1em; }
+    ul.compact li { margin: 0.12em 0; }
+    @media print {
+      a { color: #000; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+
+<section class="capa">
+  <div class="inst">PUC Minas — Pontifícia Universidade Católica de Minas Gerais</div>
+  <div class="disciplina">Testes de Software</div>
+  <div class="titulo-trabalho"><strong>Análise de Eficácia de Testes com Teste de Mutação</strong><br /><span style="font-size:10.5pt;font-weight:normal">Laboratório StrykerJS — <code class="mono">operacoes-mutante</code></span></div>
+  <div class="aluno"><strong>Aluno:</strong> Sthel Felipe Torres</div>
+  <div class="matricula"><strong>Matrícula:</strong> 1464964</div>
+  <div class="repo"><strong>Fork:</strong> https://github.com/SthelTorres/operacoes-mutante</div>
+</section>
+
+<section class="quebra-pagina">
+  <h2>1. Análise inicial</h2>
+  <p>O projeto traz 50 funções em <code class="mono">src/operacoes.js</code> e uma suíte com um teste por função: tudo passa e a cobertura parece boa, mas ela só mede <em>execução</em> de linhas, não se uma mudança sutil no código seria pega.</p>
+  <p><strong>Cobertura (Jest, suíte inicial):</strong> conforme Fig.&nbsp;1 — linhas ~98,64%, statements 85,41%, branches 58,82%, funções 100%; linha 112 ainda não coberta. Branches baixos já indicam ramos pouco exercitados.</p>
+  <p><strong>Mutação (Stryker, 1ª execução):</strong> Fig.&nbsp;2 — score <strong>73,71%</strong>, 44 sobreviventes, 12 sem cobertura, 3 timeouts (ex.: Fibonacci recursivo sob mutação). No recorte aparecem <code class="mono">Survived</code> em <code class="mono">medianaArray</code>: o teste só usa lista ímpar ordenada, então mutações no <code class="mono">sort</code> ou no ramo “par” passam.</p>
+  <p><strong>Discrepância:</strong> cobertura alta não implica testes fortes. <code class="mono">toThrow()</code> sem texto aceita qualquer erro; um único <code class="mono">isMaiorQue(10,5)</code> não distingue <code class="mono">&gt;</code> de <code class="mono">&gt;=</code>. O Stryker injeta esses bugs; se o teste continua verde, o mutante sobrevive.</p>
+
+  <div class="row-figuras">
+    <figure class="figura">
+      <strong>Fig. 1 — Jest: cobertura (50 testes).</strong>
+      <img src="cobertura-inicial.png" alt="Cobertura inicial" />
+      <div class="legenda">Cobertura “alta” mas incompleta em branches; não reflete eficácia contra mutações.</div>
+    </figure>
+    <figure class="figura">
+      <strong>Fig. 2 — Stryker inicial (73,71%).</strong>
+      <img src="stryker-inicial.png" alt="Stryker 73%" />
+      <div class="legenda">Survived e tabela resumo; evidência da lacuna da suíte original.</div>
+    </figure>
+  </div>
+
+  <h2>2. Mutantes analisados (2–3 exemplos)</h2>
+  <p>A Fig.&nbsp;2 mostra <code class="mono">Survived</code> em <code class="mono">medianaArray</code>: o Stryker, por exemplo, remove o <code class="mono">.sort(...)</code>, troca o comparador <code class="mono">a - b</code> por <code class="mono">a + b</code> ou anula o <code class="mono">if (sorted.length % 2 === 0)</code>. O teste só chama <code class="mono">medianaArray([1,2,3,4,5])</code> (ímpar e ordenado), então o resultado “3” continua igual e o mutante passa.</p>
+  <p><strong>(i) Divisão por zero.</strong> Mutação típica: <code class="mono">StringLiteral</code> — a mensagem da <code class="mono">Error</code> vira <code class="mono">""</code>. O teste antigo só usava <code class="mono">toThrow()</code>; qualquer exceção satisfaz, logo o mutante sobrevive.</p>
+  <p><strong>(ii) <code class="mono">isMaiorQue</code>.</strong> Mutação: operador <code class="mono">EqualityOperator</code> trocando <code class="mono">a &gt; b</code> por <code class="mono">a &gt;= b</code>, ou <code class="mono">ConditionalExpression</code> retornando sempre <code class="mono">true</code>. Com apenas <code class="mono">isMaiorQue(10,5)</code> esperando <code class="mono">true</code>, não há como distinguir <code class="mono">&gt;</code> de <code class="mono">&gt;=</code> nem forçar falha no “sempre true”.</p>
+  <p><strong>(iii) <code class="mono">raizQuadrada</code>.</strong> Mutação: condição <code class="mono">if (n &lt; 0)</code> virando <code class="mono">if (false)</code> (ou similar). Só se testava <code class="mono">raizQuadrada(16)</code>; o ramo de erro nunca rodava, então o mutante não era morto.</p>
+
+  <h2>3. Solução</h2>
+  <p>Mantive os 50 testes e acrescentei um <code class="mono">describe</code> com 15 blocos. Exemplos que amarram diretamente aos mutantes acima: <code class="mono">expect(() =&gt; divisao(1,0)).toThrow('Divisão por zero não é permitida.')</code>; <code class="mono">expect(isMaiorQue(3,5)).toBe(false)</code> e <code class="mono">expect(isMaiorQue(5,5)).toBe(false)</code>; <code class="mono">expect(() =&gt; raizQuadrada(-4)).toThrow('Não é possível calcular a raiz quadrada de um número negativo.')</code> e <code class="mono">expect(raizQuadrada(0)).toBe(0)</code>; <code class="mono">expect(medianaArray([4,1,3,2])).toBe(2.5)</code> para forçar ordenação e o ramo par. Também incluí mensagens em outros erros, predicados com <code class="mono">false</code>, arrays vazios, <code class="mono">clamp</code>, temperaturas e demais pontos fracos do primeiro relatório. Jest: <code class="mono">testPathIgnorePatterns</code> com <code class="mono">.stryker-tmp</code>. Stryker: <code class="mono">ignorePatterns</code> <code class="mono">.vs/**</code>. Ajustes pontuais em <code class="mono">fatorial</code>, <code class="mono">produtoArray</code> e <code class="mono">clamp</code> para reduzir mutações equivalentes.</p>
+</section>
+
+<section class="quebra-pagina">
+  <h2>4. Resultados finais</h2>
+  <p>Mutation score <strong>100%</strong> (meta &gt; 98%). Alguns <code class="mono">timeout</code> em mutantes agressivos no Fibonacci; não aparecem como <code class="mono">Survived</code>. Cobertura em <code class="mono">operacoes.js</code> passa a 100% nas quatro colunas (Fig.&nbsp;3).</p>
+  <div class="destaque">Suíte com asserções mais específicas + mesma base de funções → mutantes mortos de forma consistente no escopo do laboratório.</div>
+  <table>
+    <thead><tr><th>Métrica</th><th>Antes</th><th>Depois</th></tr></thead>
+    <tbody>
+      <tr><td>Mutation score</td><td>73,71%</td><td>100%</td></tr>
+      <tr><td>Cobertura (lin / stmt / branch / fn)</td><td>≈ 98,6 / 85,4 / 58,8 / 100%</td><td>100% / 100% / 100% / 100%</td></tr>
+      <tr><td>Testes</td><td>50</td><td>65</td></tr>
+    </tbody>
+  </table>
+  <div class="row-figuras">
+    <figure class="figura">
+      <strong>Fig. 3 — Jest após reforço.</strong>
+      <img src="cobertura-final.png" alt="Cobertura final" />
+      <div class="legenda">Cobertura plena no arquivo de produção.</div>
+    </figure>
+    <figure class="figura">
+      <strong>Fig. 4 — Stryker final (100%).</strong>
+      <img src="stryker-final.png" alt="Stryker 100%" />
+      <div class="legenda">Validação da meta de mutação.</div>
+    </figure>
+  </div>
+
+  <h2>5. Conclusão</h2>
+  <p>Cobertura e mutation score medem coisas diferentes: aqui, ~99% de linhas ainda convivia com ~74% de score. O Stryker mostrou onde os asserts eram fracos; reforçá-los elevou o score e alinhou melhor “código exercitado” com “comportamento verificado”. Para entregas críticas, uma rodada de mutação compensa como revisão objetiva da suíte.</p>
+</section>
+
+</body>
+</html>
